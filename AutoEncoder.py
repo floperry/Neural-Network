@@ -5,9 +5,9 @@ import tensorflow as tf
 class autoencoder:
 
     def __init__(self, sess, name, nodes):
-        self.sess = sess
-        self.name = name
-        self.nodes = nodes
+        self.sess = sess    # session: tf.Session for model
+        self.name = name    # string: name for model
+        self.nodes = nodes    # list: nodes for each encode layer
         self._build_net()
 
 
