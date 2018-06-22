@@ -10,21 +10,17 @@ class autoencoder(object):
         self._nodes = nodes
         self._build_net()
 
-
     @property
     def sess(self):
         return self._sess
-
 
     @property
     def name(self):
         return self._name
 
-
     @property
     def nodes(self):
         return self._nodes
-
 
     def _build_net(self):
 
@@ -70,7 +66,6 @@ class autoencoder(object):
         # define loss function and optimizer
         self.loss = self._loss_function(self.outputs, self.X)
         self.optimizer = self._optimizer(self.loss)
-
     
     # define dense layer
     def _dense_layer(self, shape, inputs, layer_name):
@@ -79,16 +74,13 @@ class autoencoder(object):
             b = tf.Variable(tf.random_normal([shape[-1]]))
         return tf.add(tf.matmul(inputs, W), b)
 
-    
     # define loss function
     def _loss_function(self, predict, labels):
         return tf.reduce_mean(tf.square(predict - labels))
 
-
     # define optimizer
     def _optimizer(self, loss):
         return tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss)
-
 
     # train model
     def train(self, x_data, epochs=100, batch_size=128, learning_rate=0.001, keep_prob=0.7):
@@ -108,22 +100,18 @@ class autoencoder(object):
             losses.append(avg_loss)
         return losses
 
-
     # predict
     def predict(self, x_data, keep_prob=1.0):
         return self.sess.run(self.outputs, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
-
 
     # get hidden feature
     def get_feature(self, x_data, keep_prob=1.0):
         return self.sess.run(self.hidden_feature, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
 
-
     # save model
     def save(self, path):
         self.saver = tf.train.Saver()
         self.saver.save(self.sess, path)
-
 
     # load model
     def load(self, path):
