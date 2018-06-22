@@ -1,5 +1,15 @@
 #coding=utf-8
 
+""" Auto-Encoder Neural Network (AE) 
+
+Using auto-encoder neural network to reconstruct digit images.
+
+
+Author: Fenng
+
+Project: https://github.com/floperry/Neural-Network/
+"""
+
 import tensorflow as tf
 
 class autoencoder(object):
