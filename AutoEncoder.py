@@ -39,7 +39,7 @@ class autoencoder(object):
 
             # define encode layer
             for i, node in enumerate(self._nodes[:-2]):
-                layer = self._dense_layer(shape=self._nodes[i, i+2], inputs=layer, 
+                layer = self._dense_layer(shape=self._nodes[i:i+2], inputs=layer, 
                                           layer_name='encoder_' + str(i+1))
                 layer = self._activation(layer)
                 layer = tf.nn.dropout(layer, keep_prob=self.keep_prob)
@@ -55,7 +55,7 @@ class autoencoder(object):
 
             # define decode layer
             for i, node in enumerate(self._nodes[::-1][:-2]):
-                layer = self._dense_layer(shape=self._nodes[::-1][i, i+2], inputs=layer,
+                layer = self._dense_layer(shape=self._nodes[::-1][i:i+2], inputs=layer,
                                           layer_name='decoder_' + str(i+1))
                 layer = self._activation(layer)
 
@@ -65,6 +65,9 @@ class autoencoder(object):
         # define loss function and optimizer
         self.loss = self._loss_function(self.outputs, self.X)
         self.optimizer = self._optimizer(self.loss)
+
+        # define initializer
+        self._sess.run(tf.global_variables_initializer())
     
     # define dense layer
     def _dense_layer(self, shape, inputs, layer_name):
@@ -93,7 +96,7 @@ class autoencoder(object):
             total_batch = int(x_data.num_examples / batch_size)
             for i in range(total_batch):
                 batch_xs, _ = x_data.next_batch(batch_size)
-                l, _ = self.sess.run([self.loss, self.optimizer], 
+                l, _ = self._sess.run([self.loss, self.optimizer], 
                         feed_dict={self.X: batch_xs, 
                                    self.learning_rate: learning_rate, 
                                    self.keep_prob: keep_prob})
@@ -105,20 +108,20 @@ class autoencoder(object):
 
     # predict
     def predict(self, x_data, keep_prob=1.0):
-        return self.sess.run(self.outputs, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
+        return self._sess.run(self.outputs, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
 
     # get hidden feature
     def get_feature(self, x_data, keep_prob=1.0):
-        return self.sess.run(self.hidden_feature, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
+        return self._sess.run(self.hidden_feature, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
 
     # save model
     def save(self, path):
-        self.saver = tf.train.Saver()
-        self.saver.save(self.sess, path)
+        saver = tf.train.Saver()
+        saver.save(self.sess, path)
 
     # load model
     def load(self, path):
-        self.saver = tf.train.Saver()
-        self.saver.restore(self.sess, path)
+        saver = tf.train.Saver()
+        saver.restore(self.sess, path)
 
 
