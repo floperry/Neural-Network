@@ -2,21 +2,39 @@
 
 import tensorflow as tf
 
-class autoencoder:
+class autoencoder(object):
 
     def __init__(self, sess, name, nodes):
-        self.sess = sess    # session: tf.Session for model
-        self.name = name    # string: name for model
-        self.nodes = nodes    # list: nodes for each encode layer
+        self._sess = sess
+        self._name = name
+        self._nodes = nodes
         self._build_net()
 
 
+    @property
+    def sess(self):
+        return self._sess
+
+
+    @property
+    def name(self):
+        return self._name
+
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+
     def _build_net(self):
+
         # check whether number of encode layers is valid
         if len(self.nodes) < 2:
             raise ValueError('At least 2 encode layers should be specified.')
 
         with tf.variable_scope(name) as scope:
+
+            # define palceholder
             self.X = tf.placeholder(tf.float32, [None, self.nodes[0]])
             self.learning_rate = tf.placeholder(tf.float32)
             self.keep_prob = tf.placeholder(tf.float32)
@@ -31,9 +49,12 @@ class autoencoder:
                 layer = tf.nn.dropout(layer, keep_prob=self.keep_prob)
 
             # define last encode layer
-            layer = self._dense_layer(shape=nodes[len(nodes)-2:len(nodes)], inputs=layer,
+            layer = self._dense_layer(shape=nodes[len(nodes)-2:len(nodes)], inputs=layer, 
                                       layer_name='encoder_' + str(len(nodes)-1))
+            
+            # get hidden layer feature
             self.hidden_feature = layer
+
             layer = tf.nn.relu(layer)
             layer = tf.nn.dropout(layer, keep_prob=self.keep_prob)
 
@@ -90,14 +111,12 @@ class autoencoder:
 
     # predict
     def predict(self, x_data, keep_prob=1.0):
-        return self.sess.run(self.outputs, 
-                feed_dict={self.X: x_data, self.keep_prob: keep_prob})
+        return self.sess.run(self.outputs, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
 
 
     # get hidden feature
     def get_feature(self, x_data, keep_prob=1.0):
-        return self.sess.run(self.hidden_feature, 
-                feed_dict={self.X: x_data, self.keep_prob: keep_prob})
+        return self.sess.run(self.hidden_feature, feed_dict={self.X: x_data, self.keep_prob: keep_prob})
 
 
     # save model
